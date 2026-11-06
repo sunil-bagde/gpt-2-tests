@@ -1,6 +1,8 @@
 import express from "express";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
+import { resolve } from "node:path";
+import { pathToFileURL } from "node:url";
 import authRouter from "./auth.js";
 
 if (!process.env.JWT_SECRET || process.env.JWT_SECRET.length < 32) {
@@ -22,4 +24,9 @@ app.use("/auth", authRouter);
 app.get("/health", (_req, res) => res.json({ ok: true }));
 
 const port = process.env.PORT || 3000;
-app.listen(port, () => console.log(`Listening on http://localhost:${port}`));
+
+export { app };
+
+if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {
+  app.listen(port, () => console.log(`Listening on http://localhost:${port}`));
+}
